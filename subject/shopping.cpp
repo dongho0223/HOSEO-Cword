@@ -11,7 +11,6 @@ int main()
     }
 
     int input_b[100], output_b[100]; 
-
     for (int i = 0; i < type; i++)
     {
         scanf_s("%d", &input_b[i]);
