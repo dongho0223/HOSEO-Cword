@@ -3,6 +3,8 @@
 #include<time.h>
 #define SIZE 100
 
+
+
 int main()
 {
 	int number[SIZE];
