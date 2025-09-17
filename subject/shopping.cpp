@@ -1,30 +1,138 @@
 #include <stdio.h>
 
-int main()
-{
-    int type, id;
-    scanf_s("%d", &type);
-    if (type < 1 || type > 100)
-    {
-        printf("wrong number");
+#define PRODUCT_COUNT 5
+
+int stock[PRODUCT_COUNT] = { 0 };
+int sold[PRODUCT_COUNT] = { 0 };
+
+int safeScanInt(const char* msg, int* var) {
+    printf("%s", msg);
+    if (scanf("%d", var) != 1) {
+        printf("잘못된 입력입니다. 숫자를 입력하세요.\n");
+        while (getchar() != '\n');
         return 0;
     }
+    while (getchar() != '\n');
+    return 1;
+}
 
-    int input_b[100], output_b[100]; 
-    for (int i = 0; i < type; i++)
-    {
-        scanf_s("%d", &input_b[i]);
-    }
-    for (int i = 0; i < type; i++)
-    {
-        scanf_s("%d", &output_b[i]);
-    }
-    scanf_s("%d", &id);
+void printMenu() {
+    printf("\n[쇼핑몰 관리 프로그램]\n");
+    printf("원하는 메뉴를 선택하세요.\n");
+    printf("1. 입고\n");
+    printf("2. 판매\n");
+    printf("3. 상품현황\n");
+    printf("4. 종료\n");
+    printf(">> ");
+}
 
-    printf("%d\n", input_b[id - 1] - output_b[id - 1]);
-    for (int i = 0; i < type; i++)
-    {
-        printf("%d ", input_b[i] - output_b[i]);
+void inputStock() {
+    int choice;
+    if (!safeScanInt("\n(출력)입고수량 입력 : 전체 상품 입력 1, 개별 상품 입력 2를 선택\n>> ", &choice))
+        return;
+
+    if (choice == 1) {
+        int qty;
+        if (!safeScanInt("(입력) 전체 상품 입고수량 입력 : ", &qty))
+            return;
+        for (int i = 0; i < PRODUCT_COUNT; i++) {
+            stock[i] += qty;
+        }
     }
+    else if (choice == 2) {
+        int id, qty;
+        if (!safeScanInt("상품 ID (0~4) 입력 : ", &id))
+            return;
+        if (id >= 0 && id < PRODUCT_COUNT) {
+            if (!safeScanInt("입고수량 입력 : ", &qty))
+                return;
+            stock[id] += qty;
+        }
+        else {
+            printf("잘못된 상품 ID입니다.\n");
+        }
+    }
+    else {
+        printf("잘못된 선택입니다.\n");
+    }
+}
+
+void sellProduct() {
+    int choice;
+    if (!safeScanInt("\n(출력)판매수량 입력 : 전체 상품 입력 1, 개별 상품 입력 2를 선택\n>> ", &choice))
+        return;
+
+    if (choice == 1) {
+        int qty;
+        if (!safeScanInt("전체 상품 판매수량 입력 : ", &qty))
+            return;
+        for (int i = 0; i < PRODUCT_COUNT; i++) {
+            if (stock[i] >= qty) {
+                stock[i] -= qty;
+                sold[i] += qty;
+            }
+            else {
+                printf("상품 %d: 재고 부족으로 판매 불가\n", i);
+            }
+        }
+    }
+    else if (choice == 2) {
+        int id, qty;
+        if (!safeScanInt("상품 ID (0~4) 입력 : ", &id))
+            return;
+        if (id >= 0 && id < PRODUCT_COUNT) {
+            if (!safeScanInt("판매수량 입력 : ", &qty))
+                return;
+            if (stock[id] >= qty) {
+                stock[id] -= qty;
+                sold[id] += qty;
+            }
+            else {
+                printf("재고 부족으로 판매 불가\n");
+            }
+        }
+        else {
+            printf("잘못된 상품 ID입니다.\n");
+        }
+    }
+    else {
+        printf("잘못된 선택입니다.\n");
+    }
+}
+
+void showStatus() {
+    printf("\n[상품 현황]\n");
+    printf("상품ID\t재고수량\t판매수량\n");
+    for (int i = 0; i < PRODUCT_COUNT; i++) {
+        printf("%d\t%d\t\t%d\n", i, stock[i], sold[i]);
+    }
+}
+
+int main() {
+    int menu;
+
+    while (1) {
+        printMenu();
+        if (!safeScanInt("", &menu))
+            continue;
+
+        switch (menu) {
+        case 1:
+            inputStock();
+            break;
+        case 2:
+            sellProduct();
+            break;
+        case 3:
+            showStatus();
+            break;
+        case 4:
+            printf("프로그램을 종료합니다.\n");
+            return 0;
+        default:
+            printf("잘못된 메뉴 선택입니다.\n");
+        }
+    }
+
     return 0;
 }
